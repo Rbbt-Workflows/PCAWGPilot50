@@ -11,22 +11,14 @@ PCAWGPilot=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass
   test_helper.rb
  }
  data=data filter="*"{
+  release_may2016.v1.4.tsv
+  samples
   vcf=vcf{
-   DO218695-DS.vcf
-   DO50311-DS.vcf
-   DO50311-WGS.vcf
-   DO50342-DS.vcf
-   DO50342-WGS.vcf
-   DO50346-DS.vcf
-   DO50346-WGS.vcf
-   DO50407-DS.vcf
-   DO50407-WGS.vcf
-   DO50415-DS.vcf
-   DO50415-WGS.vcf
-   DO50422-DS.vcf
-   DO50422-WGS.vcf
-   DO50430-DS.vcf
-   DO50430-WGS.vcf
+  }
+ }
+ www=www{
+  views=views{
+    
   }
  }
 }
