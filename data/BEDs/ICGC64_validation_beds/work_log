@@ -1,0 +1,47 @@
+#Sample Array map file
+cat ICGCValidationSamples.csv |sed 's/"//g'|grep -v "^Capture"|cut -f1,5 > map.txt
+
+##File 1 
+#For SNVs and Indels
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*.vcf|grep -v "\.sv\."`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$len=length($b[3]) >= length($b[4]) ? length($b[3]) : length($b[4]);$j1=$b[1]-1;$j2=$b[1]+$len-1; if($m{$a[9]}==1) {print "chr$b[0]\t$j1\t$j2\t$uid\n"}}}' > Array_1.bed
+
+#For SV's
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*sv.selected.vcf`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$j1=$b[1]-101;$j2=$b[1]; $j4=$b[1]+101; @z=split(/[\[,:,\]]/,$b[4]); $j5=$z[2]-101; $j6=$z[2]; $j8=$z[2]+101;if($m{$a[9]}==1) {print "chr$b[0]\t$j1\t$j2\t${uid}_p1\nchr$b[0]\t$j2\t$j4\t${uid}_p2\nchr$z[1]\t$j5\t$j6\t${uid}_p3\nchr$z[1]\t$j6\t$j8\t${uid}_p4\n"}}}' >> Array_1.bed
+
+##File 2 
+#For SNVs and Indels
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*.vcf|grep -v "\.sv\."`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$len=length($b[3]) >= length($b[4]) ? length($b[3]) : length($b[4]);$j1=$b[1]-1;$j2=$b[1]+$len-1; if($m{$a[9]}==2) {print "chr$b[0]\t$j1\t$j2\t$uid\n"}}}' > Array_2.bed
+
+#For SV's
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*sv.selected.vcf`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$j1=$b[1]-101;$j2=$b[1]; $j4=$b[1]+101; @z=split(/[\[,:,\]]/,$b[4]); $j5=$z[2]-101; $j6=$z[2]; $j8=$z[2]+101;if($m{$a[9]}==2) {print "chr$b[0]\t$j1\t$j2\t${uid}_p1\nchr$b[0]\t$j2\t$j4\t${uid}_p2\nchr$z[1]\t$j5\t$j6\t${uid}_p3\nchr$z[1]\t$j6\t$j8\t${uid}_p4\n"}}}' >> Array_2.bed
+
+##File 3 
+#For SNVs and Indels
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*.vcf|grep -v "\.sv\."`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$len=length($b[3]) >= length($b[4]) ? length($b[3]) : length($b[4]);$j1=$b[1]-1;$j2=$b[1]+$len-1; if($m{$a[9]}==3) {print "chr$b[0]\t$j1\t$j2\t$uid\n"}}}' > Array_3.bed
+
+#For SV's
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*sv.selected.vcf`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$j1=$b[1]-101;$j2=$b[1]; $j4=$b[1]+101; @z=split(/[\[,:,\]]/,$b[4]); $j5=$z[2]-101; $j6=$z[2]; $j8=$z[2]+101;if($m{$a[9]}==3) {print "chr$b[0]\t$j1\t$j2\t${uid}_p1\nchr$b[0]\t$j2\t$j4\t${uid}_p2\nchr$z[1]\t$j5\t$j6\t${uid}_p3\nchr$z[1]\t$j6\t$j8\t${uid}_p4\n"}}}' >> Array_3.bed
+
+##File 4 
+#For SNVs and Indels
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*.vcf|grep -v "\.sv\."`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$len=length($b[3]) >= length($b[4]) ? length($b[3]) : length($b[4]);$j1=$b[1]-1;$j2=$b[1]+$len-1; if($m{$a[9]}==4) {print "chr$b[0]\t$j1\t$j2\t$uid\n"}}}' > Array_4.bed
+
+#For SV's
+perl -e '%m=map{chomp;@a=split(/\t/);($a[1],$a[0])}`cat map.txt`;foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/somatic/*sv.selected.vcf`){chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$uid=join("_", $m{$a[9]},$a[9],$a[10],$b[0],$b[1]);$j1=$b[1]-101;$j2=$b[1]; $j4=$b[1]+101; @z=split(/[\[,:,\]]/,$b[4]); $j5=$z[2]-101; $j6=$z[2]; $j8=$z[2]+101;if($m{$a[9]}==4) {print "chr$b[0]\t$j1\t$j2\t${uid}_p1\nchr$b[0]\t$j2\t$j4\t${uid}_p2\nchr$z[1]\t$j5\t$j6\t${uid}_p3\nchr$z[1]\t$j6\t$j8\t${uid}_p4\n"}}}' >> Array_4.bed
+
+
+
+#File 5
+zcat /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/germline/germline.pass.filtered.selected.vcf.gz | grep -v "^#"|perl -ne 'chomp;@a=split(/\t/); $b=length($a[3]) >= length($a[4]) ? length($a[3]) : length($a[4]);$j1=$a[1]-1;$j2=$a[1]+$b-1; print "chr$a[0]\t$j1\t$j2\t$a[0]_$a[1]\n";' > Germline.bed
+
+
+#File 6
+perl -e 'foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/itd/*.gz`) {chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`zcat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v);$len=length($b[3]) >= length($b[4]) ? length($b[3]) : length($b[4]); $j1=$b[1]-1;$j2=$b[1]+$len-1; print "chr$b[0]\t$j1\t$j2\t$a[9]_$b[0]_$b[1]\n"} }' > ITD.bed
+
+
+#File 7
+perl -e 'foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/complex/*.gz`) {chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`zcat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v); $len=length($b[3]) >= length($b[4]) ? length($b[3]) : length($b[4]); $j1=$b[1]-1;$j2=$b[1]+$len-1; print "chr$b[0]\t$j1\t$j2\t$a[9]_$b[0]_$b[1]\n"} }' > Complex_Events.bed
+
+
+#File 8
+perl -e 'foreach $l (`ls /gscmnt/gc2545/ding_icgc/kye/icgc_64/validation_final_selection/selected/evolution/*.vcf`) {chomp($l);@a=split(/[\.,\/]/,$l); foreach $v (`cat $l|grep -v "^#"`) {chomp($v);@b=split(/\t/,$v); $len=length($b[3]) >= length($b[4]) ? length($b[3]) : length($b[4]); $j1=$b[1]-1;$j2=$b[1]+$len-1; print "chr$b[0]\t$j1\t$j2\t$a[9]_$b[0]_$b[1]\n"} }' > Paired_Variants.bed

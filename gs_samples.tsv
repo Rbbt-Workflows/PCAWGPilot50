@@ -1,0 +1,52 @@
+#: :type=:list
+#Donor	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2	rbbt.v1:combined_caller_vcfs	rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2	ARGO-aln:combined_caller_vcfs	ARGO-aln:muse	ARGO-aln:strelka	ARGO-aln:mutect2
+DO2783	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO4557	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO22117	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO50346	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				ARGO-aln:mutect2
+DO50407	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				ARGO-aln:mutect2
+DO19048	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO40167	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO32237	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO52171	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO37758	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO38871	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO220599	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO50415	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				ARGO-aln:mutect2
+DO44285	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO50430	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				ARGO-aln:mutect2
+DO51600	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO555	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO479	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO804	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO7822	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO36352	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO44469	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO50342	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				ARGO-aln:mutect2
+DO218695	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				
+DO36356	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO3482	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO18988	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO23651	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO49659	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO52172	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO220172	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO50311	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				ARGO-aln:mutect2
+DO21115	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO50422	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2		rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2				ARGO-aln:mutect2
+DO43506	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO15110	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO29850	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO36945	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO48977	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO15911	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO10900		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO8264		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO15870		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO42240		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO37474		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO36881		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO26971		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO38847		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO11441		rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
+DO26769			rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2

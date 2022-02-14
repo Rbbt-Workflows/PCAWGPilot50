@@ -1,0 +1,22 @@
+These are bed files for ICGC 64 validation. The work_log is in the file names work_log
+
+1. Somatic calls (SNVs, indels, and SVs) from cases included in the pool/array
+i) Array_1.bed (samples at Baylor) ii) Array_2.bed iii) Array_3.bed iv) Array_4.bed
+
+2. 5000 germline calls from all 50 cases
+v) Germline.bed
+
+3. All 328 ITDs from all 50 cases
+vi) ITD.bed
+
+4. All 474 complex events from all 50 cases
+vii) Complex_Events.bed
+
+5. All 88 paired variants from all 50 cases
+viii) Paired_Variants.bed
+
+6. HBV, HPV, EBV, and Merkel cell polyomavirus
+These probes are already present in-house.
+
+7. HLA-A, B,C; HLA-DR,-DQ, -DP;and KIR regions
+ix) ICGC_HLA_exonTargets.bed x) kir_regions_hg19.bed

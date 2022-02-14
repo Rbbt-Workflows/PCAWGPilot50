@@ -2,3 +2,10 @@ pkg
 .source
 .save
 .crap
+evaluations
+result
+gold_standard
+tmp
+data/BSC_alignments/
+data/bed.100/
+data/bed/

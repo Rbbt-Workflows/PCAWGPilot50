@@ -1,0 +1,10 @@
+#: :type=:list
+#Donor	sliced:ARGO_mutect2	sliced:muse	sliced:ARGO_mutect2_filters	sliced:strelka	sliced:mutect2	rbbt.v1:ARGO_mutect2	rbbt.v1:muse	rbbt.v1:ARGO_mutect2_filters	rbbt.v1:strelka	rbbt.v1:mutect2
+DO218695	sliced:ARGO_mutect2		sliced:ARGO_mutect2_filters				rbbt.v1:muse		rbbt.v1:strelka	
+DO50346	sliced:ARGO_mutect2		sliced:ARGO_mutect2_filters				rbbt.v1:muse		rbbt.v1:strelka	rbbt.v1:mutect2
+DO50415							rbbt.v1:muse		rbbt.v1:strelka	rbbt.v1:mutect2
+DO50422							rbbt.v1:muse		rbbt.v1:strelka	rbbt.v1:mutect2
+DO50430							rbbt.v1:muse		rbbt.v1:strelka	rbbt.v1:mutect2
+DO50342							rbbt.v1:muse		rbbt.v1:strelka	rbbt.v1:mutect2
+DO50407							rbbt.v1:muse		rbbt.v1:strelka	rbbt.v1:mutect2
+DO50311										rbbt.v1:mutect2

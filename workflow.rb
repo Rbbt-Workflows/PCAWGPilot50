@@ -189,7 +189,7 @@ module PCAWGPilot48
   input :wgs_caller, :select, "Caller used for WGS", :mutect2, :select_options => %w(mutect2 strelka muse)
   extension :vcf
   dep_task :wgs_vcf, PCAWGPilot48, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
-    file = Rbbt.data.vcf[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find
+    file = Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find
     {:inputs => options.merge(:vcf => file), :jobname => donor + "-WGS"}
   end
 
@@ -202,10 +202,7 @@ module PCAWGPilot48
   input :donor, :select, "Donor to compare to", nil, :select_options => SAMPLES, :jobname => true
   dep :bed_file, :jobname => :donor
   dep :subset_by_af, :vcf => :vcf_file, :bed => :bed_file, :compute => :produce, :jobname => :donor
-  dep :donor_vcfeval, :wgs_caller => :placeholder, "PCAWGPilot48#wgs_vcf" => :subset_by_af, :jobname => :donor
-  task :evaluate => :tsv do |vcf_file|
-    step(:donor_vcfeval).load
-  end
+  dep_task :evaluate, PCAWGPilot48, :donor_vcfeval, :wgs_caller => :placeholder, "PCAWGPilot48#wgs_vcf" => :subset_by_af, :jobname => :donor
 
 end
 

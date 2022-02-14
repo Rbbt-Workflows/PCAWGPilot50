@@ -1,0 +1,18 @@
+Genome build	hg19
+Number of regions	88563
+Length of regions (bp)	9595461
+
+Statistics	Probe_Coverage	Estimated_Coverage
+Target Bases Covered	5805618	7064270
+% Target Bases Covered	60.5	73.6
+Targets with no coverage	23972	23877
+
+Target Bases Not Covered	3789843	2531191
+     Due to N's	421	395
+     Due to repeats	2900738	2178678
+% Target Bases Not Covered	39.5	26.4
+     Due to N's	 0.0	 0.0
+     Due to repeats	30.2	22.7
+
+Total capture targets	71938
+Total capture space (bp)	8316714
