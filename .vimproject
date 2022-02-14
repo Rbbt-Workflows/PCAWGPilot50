@@ -1,4 +1,4 @@
-PCAWGPilot48=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass *.txt *.conf" {
+PCAWGPilot50=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sass *.txt *.conf" {
  workflow.rb
  bin=bin filter="*"{
   gs_samples.rb
@@ -9,7 +9,6 @@ PCAWGPilot48=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sa
   tasks=tasks{
    figures.rb
    genomic_mutations.rb
-   old.rb
   }
  }
  test=test {

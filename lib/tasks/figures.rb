@@ -1,4 +1,4 @@
-module PCAWGPilot48
+module PCAWGPilot50
   dep :donor_vcfeval, :compute => :bootstrap, :maf => :placeholder, :bed_type => :placeholder do |jobname,options,dependencies|
     SAMPLES.collect do |donor|
       [0.1, 0.05, 0.01, 0.005, 0.001].collect do |maf|

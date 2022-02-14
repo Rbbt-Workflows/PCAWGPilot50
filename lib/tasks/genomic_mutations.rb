@@ -1,4 +1,4 @@
-module PCAWGPilot48
+module PCAWGPilot50
   input :donor, :string, "Sample name", "DO50415"
   input :final, :boolean, "Use final list of mutations or the unfiltered", true
   dep_task :ds_genomic_mutations, Sequence, :genomic_mutations, :vcf => :placeholder do |jobname,options|

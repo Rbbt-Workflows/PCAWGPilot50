@@ -8,7 +8,7 @@ Misc.add_libdir if __FILE__ == $0
 Workflow.require_workflow "HTS"
 Workflow.require_workflow "Sequence"
 Workflow.require_workflow "PCAWG"
-module PCAWGPilot48
+module PCAWGPilot50
   extend Workflow
 
   SAMPLES = Rbbt.data.donors.list - %w(DO50311)
@@ -171,7 +171,7 @@ module PCAWGPilot48
   input :ds_caller, :select, "Caller used for DS", :mutect2, :select_options => %w(mutect2 strelka muse)
   input :ds_system, :select, "System used for DS", :rbbt, :select_options => %w(rbbt rbbt.1 ARGO-aln ARGO)
   extension :vcf
-  dep_task :ds_vcf, PCAWGPilot48, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
+  dep_task :ds_vcf, PCAWGPilot50, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
     file = case options[:ds_system].to_s
            when 'rbbt'
              Rbbt.gold_standard[options[:ds_caller].to_s][donor + "-DS-orig.vcf"].find
@@ -188,7 +188,7 @@ module PCAWGPilot48
   dep :bed_file
   input :wgs_caller, :select, "Caller used for WGS", :mutect2, :select_options => %w(mutect2 strelka muse)
   extension :vcf
-  dep_task :wgs_vcf, PCAWGPilot48, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
+  dep_task :wgs_vcf, PCAWGPilot50, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
     file = Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find
     {:inputs => options.merge(:vcf => file), :jobname => donor + "-WGS"}
   end
@@ -202,7 +202,7 @@ module PCAWGPilot48
   input :donor, :select, "Donor to compare to", nil, :select_options => SAMPLES, :jobname => true
   dep :bed_file, :jobname => :donor
   dep :subset_by_af, :vcf => :vcf_file, :bed => :bed_file, :compute => :produce, :jobname => :donor
-  dep_task :evaluate, PCAWGPilot48, :donor_vcfeval, :wgs_caller => :placeholder, "PCAWGPilot48#wgs_vcf" => :subset_by_af, :jobname => :donor
+  dep_task :evaluate, PCAWGPilot50, :donor_vcfeval, :wgs_caller => :placeholder, "PCAWGPilot50#wgs_vcf" => :subset_by_af, :jobname => :donor
 
 end
 
