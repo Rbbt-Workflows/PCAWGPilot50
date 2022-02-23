@@ -1,0 +1,68 @@
+%h1 Figures
+- tsv = Rbbt.root["evaluations.tsv"].tsv :type => :list
+- names = %w(ds_caller ds_system wgs_caller wgs_system mutation_type)
+= action_parameters do
+  - names.each do |name|
+    - field = Misc.humanize(name).sub("Ds", "DS").sub("Wgs", "WGS")
+    - input name, :select, "TSV field", nil, :select_options => tsv.column(field).values.flatten.compact.uniq + %w(all color)
+  - input :use_max_donors, :boolean, "Use only donors that have maximum number of entries entries", false
+    
+
+:ruby
+  binding = self.binding
+  color_values = []
+  names.each do |name|
+    if local_variables.include?(name.to_sym)
+      value = binding.local_variable_get(name.to_sym)
+    else
+      value = "none"
+    end
+
+    if value == 'color'
+      field = Misc.humanize(name).sub("Ds", "DS").sub("Wgs", "WGS")
+      color_values << field
+      value = "none"
+    end
+
+    binding.local_variable_set(name.to_sym, value)
+  end
+
+
+- require 'rbbt/util/R/plot'
+- tsv = Rbbt.root["evaluations.tsv"].tsv :type => :list
+
+- names.each do |name|
+  - value = binding.local_variable_get(name.to_sym)
+  - next if value == 'none' || value == 'all'
+  - field = Misc.humanize(name).sub("Ds", "DS").sub("Wgs", "WGS")
+  - tsv = tsv.select(field => value)
+
+- if defined?(use_max_donors) && use_max_donors
+  - counts = Misc.counts(tsv.column("Donor").values)
+  - max = counts.values.max
+  - max_donors = counts.select{|d,c| c == max}.collect{|d,c| d }
+  - tsv = tsv.select("Donor" => max_donors) 
+
+- if color_values.any?
+  - tsv.add_field "Label" do |k,v|
+    - v.values_at(*color_values) * "-"
+
+- Log.tsv tsv
+- if tsv.size > 0
+  %div.plot=R::SVG.ggplot(tsv, 'ggplot(data) + geom_point(aes(Sensitivity,Precision,color=Label)) + ylim(0,1) + xlim(0,1)', 7, 7) 
+
+- if color_values.any?
+  %div.plot=R::SVG.ggplot(tsv, 'names(data) <- make.names(names(data)); ggplot(data) + geom_boxplot(aes(x=Label,y=F.score))', 7, 7) 
+
+= table do
+  - tsv
+:sass
+  .field
+    width: 200px
+    margin-left: 20px
+    float: left
+    clear: none
+
+  svg
+    width: '1000px'
+    height: '1000px'

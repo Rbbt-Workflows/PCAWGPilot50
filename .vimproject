@@ -7,14 +7,17 @@ PCAWGPilot50=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sa
  }
  lib=lib {
   tasks=tasks{
-   figures.rb
    genomic_mutations.rb
+   sliced.rb
+   run.rb
+   figures.rb
   }
  }
  test=test {
   test_helper.rb
  }
  data=data {
+  ARGO_donors.txt
   donors
   release_may2016.v1.4.tsv
   samples
@@ -818,9 +821,11 @@ PCAWGPilot50=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sa
    DO8264-DS-orig.vcf
   }
  }
-}
-www=www{
- views=views{
+ www=www{
+  views=views{
+   main=main{
+    figures.haml
+   }
+  }
  }
-}
 }

@@ -5,16 +5,18 @@ Misc.add_libdir if __FILE__ == $0
 
 #require 'rbbt/sources/MODULE'
 
+Workflow.require_workflow "Sample"
 Workflow.require_workflow "HTS"
 Workflow.require_workflow "Sequence"
 Workflow.require_workflow "PCAWG"
+Workflow.require_workflow "HTSBenchmark"
 module PCAWGPilot50
   extend Workflow
 
   SAMPLES = Rbbt.data.donors.list - %w(DO50311)
 
-  input :vcf, :path, "VCF file"
-  input :bed, :path, "BED file"
+  input :vcf, :path, "VCF file", nil, :nofile => true
+  input :bed, :path, "BED file", nil, :nofile => true
   extension :vcf
   task :subset_by_bed do |vcf,bed|
     output = file('output/donor')
@@ -22,6 +24,7 @@ module PCAWGPilot50
     #CMD.cmd("vcftools --vcf #{vcf} --bed #{bed}  --out #{output} --recode --keep-INFO-all")
     #Open.mv file('output').glob("*.vcf").first, self.tmp_path
     if Misc.is_filename?(vcf)
+      raise ParameterException, "File not found #{vcf}" unless Open.exists? vcf
       CMD.cmd("bcftools view --targets-file  #{bed} #{vcf}  -o #{self.tmp_path}")
     else
       TmpFile.with_file(vcf) do |tvcf|
@@ -44,6 +47,14 @@ module PCAWGPilot50
       snv = true
       snv = false unless %w(A C T G).include? ref
       snv = false unless %w(A C T G).include? alt
+
+
+      if ref.length >= 2 && ref.length == alt.length &&
+        (ref.chars.uniq - %w(A C T G)).empty? &&
+        (alt.chars.uniq - %w(A C T G)).empty?
+
+        snv = true 
+      end
 
       case mutation_type.to_s.downcase
       when 'snv'
@@ -163,6 +174,7 @@ module PCAWGPilot50
            else
              Rbbt.data.computed_beds[bed_type].glob(donor + "-DS*").first 
            end
+    raise ParameterException, "File not found #{file}" unless Open.exists? file
     Open.cp file, self.tmp_path
     nil
   end
@@ -182,14 +194,25 @@ module PCAWGPilot50
            when 'ARGO'
              Rbbt.gold_standard[options[:ds_caller].to_s][donor + "-DS-ARGO.vcf"].find
            end
+    raise ParameterException, "File #{file} not found" unless Open.exists?(file)
     {:inputs => options.merge(:vcf => file), :jobname => donor + "-DS"}
   end
 
   dep :bed_file
   input :wgs_caller, :select, "Caller used for WGS", :mutect2, :select_options => %w(mutect2 strelka muse)
+  input :wgs_system, :select, "System used for DS", :normal, :select_options => %w(normal sliced sliced-mini)
   extension :vcf
   dep_task :wgs_vcf, PCAWGPilot50, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
     file = Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find
+    file = case options[:wgs_system].to_s
+           when 'normal'
+             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find
+           when 'sliced'
+             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS-Sliced.vcf"].find
+           when 'sliced-mini'
+             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS-Sliced-mini.vcf"].find
+           end
+    raise ParameterException, "File #{file} not found" unless Open.exists?(file)
     {:inputs => options.merge(:vcf => file), :jobname => donor + "-WGS"}
   end
 
@@ -208,6 +231,8 @@ end
 
 require 'tasks/genomic_mutations'
 require 'tasks/figures'
+require 'tasks/sliced'
+require 'tasks/run'
 
 #require 'rbbt/knowledge_base/MODULE'
 #require 'rbbt/entity/MODULE'

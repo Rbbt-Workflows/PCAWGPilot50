@@ -184,4 +184,74 @@ print(plot)
     nil
   end
 
+  dep :donor_vcfeval, :compute => :canfail do |donor,options|
+    jobs = []
+    %w(mutect2 mutect2_pon strelka muse combined_caller_vcfs).each do |ds_caller|
+      %w(rbbt ARGO ARGO-aln).each do |ds_system|
+        %w(ARGO_mutect2 ARGO_sanger mutect2 strelka).each do |wgs_caller|
+          %w(normal sliced sliced-mini).each do |wgs_system|
+            %w(SNV indel both).each do |type|
+    
+              begin
+                jobs << PCAWGPilot50.job(:donor_vcfeval, donor, 
+                                         :wgs_caller => wgs_caller,
+                                         :wgs_system => wgs_system,
+                                         :ds_caller => ds_caller,
+                                         :ds_system => ds_system,
+                                         :mutation_type => type)
+              rescue
+              end
+            end
+          end
+        end
+      end
+    end
+    jobs
+  end
+  task :donor_evaluation_batch => :tsv do
+    tsv = TSV.setup({}, "ID~Donor,Mutation type,DS caller, DS system,WGS caller,WGS system,TP,FP,FN,Precision,Sensitivity,F-score,vcfeval")
+    donor = self.clean_name
+    dependencies.each do |dep|
+      next if dep.error? || dep.aborted?
+
+      res = dep.load
+
+      next if res.empty?
+
+      values = [donor] + dep.recursive_inputs.values_at(:mutation_type, :ds_caller, :ds_system, :wgs_caller, :wgs_system)
+      values += res[res.keys.first].values_at "True-pos-call", "False-pos", "False-neg", "Precision", "Sensitivity", "F-measure"
+      values << dep.step(:vcfeval).path
+      id = Misc.digest(values.inspect)
+      tsv[id] = values
+
+    end
+    tsv
+  end
+
+  dep :donor_evaluation_batch do |jobname,options|
+    SAMPLES.collect do |donor|
+      {:inputs => options, :jobname => donor}
+    end
+  end
+  task :evaluation_batch => :tsv do
+    dependencies.inject(nil) do |acc,dep|
+      tsv = dep.load
+      if acc.nil?
+        acc = tsv
+      else
+        acc.merge!(tsv)
+        acc
+      end
+    end
+  end
+
+  input :evaluations, :tsv, "Evaluation values"
+  extension :svg
+  task :sensitivity_recall => :text do |evaluations|
+    evaluations = TSV.open(evaluations) unless TSV === evaluations
+    R::SVG.ggplot evaluations, <<-EOF
+ggplot(data) + geom_point(aes(x=Sensitivity, y=Precision))
+    EOF
+  end
+
 end
