@@ -186,10 +186,10 @@ print(plot)
 
   dep :donor_vcfeval, :compute => :canfail do |donor,options|
     jobs = []
-    %w(mutect2 mutect2_pon strelka muse combined_caller_vcfs).each do |ds_caller|
+    %w(ARGO_mutect2 mutect2_pon_4.2.5 strelka muse).each do |ds_caller|
       %w(rbbt ARGO ARGO-aln).each do |ds_system|
-        %w(ARGO_mutect2 ARGO_sanger mutect2 strelka).each do |wgs_caller|
-          %w(normal sliced sliced-mini).each do |wgs_system|
+        PCAWGPilot50::WGS_CALLERS.each do |wgs_caller|
+          %w(normal sliced).each do |wgs_system|
             %w(SNV indel both).each do |type|
     
               begin

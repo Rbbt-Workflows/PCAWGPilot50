@@ -13,10 +13,34 @@ Workflow.require_workflow "HTSBenchmark"
 module PCAWGPilot50
   extend Workflow
 
+  WGS_CALLERS =<<-EOF.split("\n")
+ARGO_mutect2
+ARGO_sanger
+SAGE
+lofreq
+muse_dbnsp
+muse_no_dbnsp
+mutect2
+somatic_sniper
+strelka_manta
+strelka_no_manta
+varscan
+consensus_min2
+consensus_min3
+  EOF
+
+  CONSENSUS_CALLERS =<<-EOF.split("\n")
+ARGO_mutect2
+SAGE
+lofreq
+somatic_sniper
+varscan
+  EOF
+
   SAMPLES = Rbbt.data.donors.list - %w(DO50311)
 
-  input :vcf, :path, "VCF file", nil, :nofile => true
-  input :bed, :path, "BED file", nil, :nofile => true
+  input :vcf, :file, "VCF file", nil, :nofile => true
+  input :bed, :file, "BED file", nil, :nofile => true
   extension :vcf
   task :subset_by_bed do |vcf,bed|
     output = file('output/donor')
@@ -131,6 +155,12 @@ module PCAWGPilot50
               end
         af = var.to_f / sum
         next if af <= maf
+      elsif hash["RD"]
+        rd = hash["RD"].to_i
+        ad = hash["AD"].to_i
+        total = rd + ad
+        af = ad.to_f / total
+        next if af <= maf
       elsif hash["AD"]
         parts = hash["AD"].split(",")
         ref, alt, *rest = parts
@@ -143,6 +173,11 @@ module PCAWGPilot50
         total = Misc.sum(hash.values_at("PR", "NR").collect(&:to_f))
         support = Misc.sum(hash.values_at("PU", "NU").collect(&:to_f))
         support.to_f / total.to_f
+      elsif hash["DP4"]
+        rf, rb, af, ab = hash["PM"].to_f
+        ref = rf.to_i + rb.to_i
+        alt = af.to_i + ab.to_i
+        alt.to_f / (ref + alt)
       else
         raise "No entry with AF in VCF file"
       end
@@ -164,12 +199,16 @@ module PCAWGPilot50
 
   input :bed_type, :select, "BED type", :capture, :select_options => %w(capture 50 100 150 200)
   extension :bed
-  task :bed_file => :path do |bed_type|
+  task :bed_file => :text do |bed_type|
     donor ||= clean_name
     file = if bed_type.to_s == 'capture'
-             tsv = Rbbt.data["release_may2016.v1.4.tsv"].tsv(:header_hash => '', :fields => ["tumor_wgs_bwa_alignment_gnos_id"], :key_field => "icgc_donor_id", :type => :single)
-             id = tsv[donor]
-             num = Rbbt.data.BEDs.ICGC64_validation_beds["map.txt"].tsv(:key_field => 1, :fields => [0], :type => :single)[id]
+             if donor == "DO7822"
+               num = 1
+             else
+               tsv = Rbbt.data["release_may2016.v1.4.tsv"].tsv(:header_hash => '', :fields => ["tumor_wgs_bwa_alignment_gnos_id"], :key_field => "icgc_donor_id", :type => :single)
+               id = tsv[donor]
+               num = Rbbt.data.BEDs.ICGC64_validation_beds["map.txt"].tsv(:key_field => 1, :fields => [0], :type => :single)[id]
+             end
              Rbbt.data.capture_beds["Array#{num}.bed"].find
            else
              Rbbt.data.computed_beds[bed_type].glob(donor + "-DS*").first 
@@ -203,14 +242,14 @@ module PCAWGPilot50
   input :wgs_system, :select, "System used for DS", :normal, :select_options => %w(normal sliced sliced-mini)
   extension :vcf
   dep_task :wgs_vcf, PCAWGPilot50, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
-    file = Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find
+    file = Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find(:lib)
     file = case options[:wgs_system].to_s
            when 'normal'
-             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find
+             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS.vcf"].find(:lib)
            when 'sliced'
-             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS-Sliced.vcf"].find
+             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS-Sliced.vcf"].find(:lib)
            when 'sliced-mini'
-             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS-Sliced-mini.vcf"].find
+             Rbbt.result[options[:wgs_caller].to_s][donor + "-WGS-Sliced-mini.vcf"].find(:lib)
            end
     raise ParameterException, "File #{file} not found" unless Open.exists?(file)
     {:inputs => options.merge(:vcf => file), :jobname => donor + "-WGS"}
@@ -227,6 +266,39 @@ module PCAWGPilot50
   dep :subset_by_af, :vcf => :vcf_file, :bed => :bed_file, :compute => :produce, :jobname => :donor
   dep_task :evaluate, PCAWGPilot50, :donor_vcfeval, :wgs_caller => :placeholder, "PCAWGPilot50#wgs_vcf" => :subset_by_af, :jobname => :donor
 
+  input :consensus_callers, :array, "Consensus callers to consider", PCAWGPilot50::CONSENSUS_CALLERS
+  dep :wgs_vcf, :wgs_caller => :placeholder, :compute => :canfail do |jobname,options|
+    options[:consensus_callers].collect do |ccaller|
+      {:inputs => options.merge(:wgs_caller => ccaller), :jobname => jobname }
+    end
+  end
+  extension :vcf
+  task :wgs_combined_vcf => :text do
+    files = {}
+    dependencies.each do |dep|
+      vcaller = dep.recursive_inputs[:wgs_caller]
+      files[vcaller] = dep.path
+    end
+    HTS.combine_caller_vcfs(files)
+  end
+
+  dep :wgs_combined_vcf
+  input :min_callers, :integer, "Min number of callers to pass variant", 2
+  task :wgs_consensus_vcf => :text do |min_callers|
+    TSV.traverse step(:wgs_combined_vcf), :type => :array, :into => :stream do |line|
+      next line if line =~ /^#/
+      parts = line.split("\t")
+      filter = parts[6]
+
+      callers = parts[6].split(";")
+      callers = callers.select{|f| f.split("--").last == "PASS"}
+      callers = callers.collect{|f| f.split("--").first }
+      num = callers.uniq.length
+      next unless num >= min_callers
+      parts[6] = "PASS"
+      parts * "\t"
+    end
+  end
 end
 
 require 'tasks/genomic_mutations'
