@@ -29,12 +29,13 @@ consensus_min2
 consensus_min3
   EOF
 
-  CONSENSUS_CALLERS =<<-EOF.split("\n")
+  DS_CALLERS =<<-EOF.split("\n")
 ARGO_mutect2
-SAGE
-lofreq
-somatic_sniper
-varscan
+muse
+mutect2
+mutect2_pon
+mutect2_pon_4.2.5
+strelka
   EOF
 
   SAMPLES = Rbbt.data.donors.list - %w(DO50311)
@@ -266,42 +267,10 @@ varscan
   dep :subset_by_af, :vcf => :vcf_file, :bed => :bed_file, :compute => :produce, :jobname => :donor
   dep_task :evaluate, PCAWGPilot50, :donor_vcfeval, :wgs_caller => :placeholder, "PCAWGPilot50#wgs_vcf" => :subset_by_af, :jobname => :donor
 
-  input :consensus_callers, :array, "Consensus callers to consider", PCAWGPilot50::CONSENSUS_CALLERS
-  dep :wgs_vcf, :wgs_caller => :placeholder, :compute => :canfail do |jobname,options|
-    options[:consensus_callers].collect do |ccaller|
-      {:inputs => options.merge(:wgs_caller => ccaller), :jobname => jobname }
-    end
-  end
-  extension :vcf
-  task :wgs_combined_vcf => :text do
-    files = {}
-    dependencies.each do |dep|
-      vcaller = dep.recursive_inputs[:wgs_caller]
-      files[vcaller] = dep.path
-    end
-    HTS.combine_caller_vcfs(files)
-  end
-
-  dep :wgs_combined_vcf
-  input :min_callers, :integer, "Min number of callers to pass variant", 2
-  task :wgs_consensus_vcf => :text do |min_callers|
-    TSV.traverse step(:wgs_combined_vcf), :type => :array, :into => :stream do |line|
-      next line if line =~ /^#/
-      parts = line.split("\t")
-      filter = parts[6]
-
-      callers = parts[6].split(";")
-      callers = callers.select{|f| f.split("--").last == "PASS"}
-      callers = callers.collect{|f| f.split("--").first }
-      num = callers.uniq.length
-      next unless num >= min_callers
-      parts[6] = "PASS"
-      parts * "\t"
-    end
-  end
 end
 
 require 'tasks/genomic_mutations'
+require 'tasks/consensus'
 require 'tasks/figures'
 require 'tasks/sliced'
 require 'tasks/run'

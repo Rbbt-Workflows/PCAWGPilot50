@@ -10,6 +10,7 @@ PCAWGPilot50=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sa
    genomic_mutations.rb
    sliced.rb
    run.rb
+   consensus.rb
    figures.rb
   }
  }
