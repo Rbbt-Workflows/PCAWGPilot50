@@ -1,4 +1,3 @@
-#: :type=:list
 #Donor	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2	rbbt.v1:combined_caller_vcfs	rbbt.v1:muse	rbbt.v1:strelka	rbbt.v1:mutect2	ARGO-aln:combined_caller_vcfs	ARGO-aln:muse	ARGO-aln:strelka	ARGO-aln:mutect2
 DO2783	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
 DO4557	rbbt:combined_caller_vcfs	rbbt:muse	rbbt:strelka	rbbt:mutect2								ARGO-aln:mutect2
