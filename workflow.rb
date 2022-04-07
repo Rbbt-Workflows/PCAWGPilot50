@@ -25,18 +25,44 @@ somatic_sniper
 strelka_manta
 strelka_no_manta
 varscan
+consensus_min1
 consensus_min2
 consensus_min3
   EOF
 
+  WGS_CONSENSUS_CALLERS =<<-EOF.split("\n")
+ARGO_mutect2
+SAGE
+lofreq
+somatic_sniper
+varscan
+svABA
+  EOF
+
   DS_CALLERS =<<-EOF.split("\n")
 ARGO_mutect2
+mutect2_pon_4_2_5
 muse
-mutect2
-mutect2_pon
-mutect2_pon_4.2.5
 strelka
+lofreq
+SAGE
+somatic_sniper
+svABA
+consensus_min1
+consensus_min2
+consensus_min3
   EOF
+
+  DS_CONSENSUS_CALLERS =<<-EOF.split("\n")
+mutect2_pon_4_2_5
+muse
+strelka
+lofreq
+sage
+somatic_sniper
+svABA
+  EOF
+
 
   SAMPLES = Rbbt.data.donors.list - %w(DO50311)
 
@@ -50,10 +76,10 @@ strelka
     #Open.mv file('output').glob("*.vcf").first, self.tmp_path
     if Misc.is_filename?(vcf)
       raise ParameterException, "File not found #{vcf}" unless Open.exists? vcf
-      CMD.cmd("bcftools view --targets-file  #{bed} #{vcf}  -o #{self.tmp_path}")
+      CMD.cmd("bcftools sort #{vcf} | bcftools view --targets-file  #{bed} - -o #{self.tmp_path}")
     else
       TmpFile.with_file(vcf) do |tvcf|
-        CMD.cmd("bcftools view --targets-file  #{bed} #{tvcf}  -o #{self.tmp_path}")
+        CMD.cmd("bcftools sort #{vcf} | bcftools view --targets-file  #{bed} -o #{self.tmp_path}")
       end
     end
     nil
@@ -63,35 +89,45 @@ strelka
   input :mutation_type, :select, "Mutations to consider", :SNV, :select_options => %w(SNV indel both)
   extension :vcf
   task :subset_by_type => :text do |mutation_type|
+    mutation_type = mutation_type.to_s.downcase
+
     TSV.traverse step(:subset_by_bed), :type => :array, :into => :stream do |line|
       next line if line =~ /^#/
       parts = line.split("\t")
 
-      ref, alt = parts.values_at 3, 4
+      ref, alts = parts.values_at 3, 4
 
-      snv = true
-      snv = false unless %w(A C T G).include? ref
-      snv = false unless %w(A C T G).include? alt
+      good_alts = alts.split(",").select do |alt|
 
+        snv = true
+        snv = false unless %w(A C T G).include? ref
+        snv = false unless %w(A C T G).include? alt
 
-      if ref.length >= 2 && ref.length == alt.length &&
-        (ref.chars.uniq - %w(A C T G)).empty? &&
-        (alt.chars.uniq - %w(A C T G)).empty?
+        if ref.length >= 2 && ref.length == alt.length &&
+            (ref.chars.uniq - %w(A C T G)).empty? &&
+            (alt.chars.uniq - %w(A C T G)).empty?
 
-        snv = true 
+          snv = true 
+        end
+
+        case mutation_type
+        when 'snv'
+          snv
+        when 'indel'
+          ! snv
+        when 'both'
+          true
+        else
+          raise ParameterException, "Unknown mutation type: #{mutation_type}"
+        end
+
       end
 
-      case mutation_type.to_s.downcase
-      when 'snv'
-        next unless snv
-      when 'indel'
-        next if snv
-      when 'both'
-      else
-        raise ParameterException, "Unknown mutation type: #{mutation_type}"
-      end
+      next if good_alts.empty?
 
-      line
+      nparts = parts.dup
+      nparts[4] = good_alts * ","
+      nparts * "\t"
     end
   end
 
@@ -107,16 +143,22 @@ strelka
     tumor_sample = begin
                      CMD.cmd("grep 'tumor_sample=' '#{vcf}'").read.strip.split("=").last
                    rescue
-                     if TSV.parse_header(vcf).fields.include? "TUMOR"
+                     if fields.include? "TUMOR"
                        Log.warn "Could not find tumor_sample field in input VCF, using TUMOR"
                        "TUMOR"
                      else
                        Log.warn "Could not find tumor_sample field in input VCF, using last field"
-                       TSV.parse_header(vcf).fields.last
+                       fields.last
                      end
                    end
 
     tumor_pos = fields.index tumor_sample
+
+    if fields.length == 10
+      normal_pos = ([8,9] - [tumor_pos]).first
+    else
+      normal_pos = nil
+    end
 
     TSV.traverse vcf, :type => :array, :into => :stream do |line|
       next line if line =~ /^##/
@@ -164,10 +206,15 @@ strelka
         next if af <= maf
       elsif hash["AD"]
         parts = hash["AD"].split(",")
-        ref, alt, *rest = parts
-        total = parts.inject(0){|acc,e| acc += e.to_i}
-        af = alt.to_f / total
-        next if af <= maf
+        if parts.length == 1
+          af = parts.first.to_f / hash["AD"].to_f
+          next if af <= maf
+        else
+          ref, alt, *rest = parts
+          total = parts.inject(0){|acc,e| acc += e.to_i}
+          af = alt.to_f / total
+          next if af <= maf
+        end
       elsif hash["PM"]
         hash["PM"].to_f
       elsif hash["PR"]
@@ -193,6 +240,7 @@ strelka
       else
         parts[8] += ":GT"
         parts[tumor_pos + 1] += ":1/0"
+        parts[normal_pos + 1] += ":0/0" if normal_pos
         parts * "\t"
       end
     end
@@ -221,10 +269,12 @@ strelka
 
   dep :bed_file
   input :ds_caller, :select, "Caller used for DS", :mutect2, :select_options => %w(mutect2 strelka muse)
-  input :ds_system, :select, "System used for DS", :rbbt, :select_options => %w(rbbt rbbt.1 ARGO-aln ARGO)
+  input :ds_system, :select, "System used for DS", :rbbt, :select_options => %w(realn rbbt rbbt.1 ARGO-aln ARGO)
   extension :vcf
   dep_task :ds_vcf, PCAWGPilot50, :subset_by_af, :bed => :bed_file, :vcf => :placeholder  do |donor,options|
     file = case options[:ds_system].to_s
+           when 'realn'
+             Rbbt.gold_standard[options[:ds_caller].to_s][donor + "-DS-realn.vcf"].find
            when 'rbbt'
              Rbbt.gold_standard[options[:ds_caller].to_s][donor + "-DS-orig.vcf"].find
            when 'rbbt.1'

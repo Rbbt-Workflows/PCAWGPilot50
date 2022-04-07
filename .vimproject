@@ -4,6 +4,8 @@ PCAWGPilot50=/$PWD filter="*.rb *.rake Rakefile *.rdoc *.R *.sh *.js *.haml *.sa
   gs_samples.rb
   result_samples.rb
   sample_fn.rb
+  prepare_consensus.sh
+  prepare_evaluations.sh
  }
  lib=lib {
   tasks=tasks{

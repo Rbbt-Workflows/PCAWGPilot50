@@ -1,24 +1,14 @@
 module PCAWGPilot50
-  WGS_CONSENSUS_CALLERS =<<-EOF.split("\n")
-ARGO_mutect2
-SAGE
-lofreq
-somatic_sniper
-varscan
-  EOF
-
-  DS_CONSENSUS_CALLERS =<<-EOF.split("\n")
-muse
-mutect2_pon_4.2.5
-strelka
-  EOF
-
 
   input :consensus_callers, :array, "Consensus callers to consider", PCAWGPilot50::WGS_CONSENSUS_CALLERS
   dep :wgs_vcf, :wgs_caller => :placeholder, :compute => :canfail do |jobname,options|
     options[:consensus_callers].collect do |ccaller|
-      {:inputs => options.merge(:wgs_caller => ccaller), :jobname => jobname }
-    end
+      begin
+        PCAWGPilot50.job(:wgs_vcf, jobname, options.merge(:wgs_caller => ccaller))
+      rescue
+        next nil
+      end
+    end.compact
   end
   extension :vcf
   task :wgs_combined_vcf => :text do
@@ -55,7 +45,7 @@ strelka
     options[:consensus_callers].collect do |ccaller|
       begin
         PCAWGPilot50.job(:ds_vcf, jobname, options.merge(:ds_caller => ccaller))
-      rescue
+      rescue Exception
         next nil
       end
     end.compact
@@ -72,6 +62,7 @@ strelka
 
   dep :ds_combined_vcf
   input :min_callers, :integer, "Min number of callers to pass variant", 2
+  extension :vcf
   task :ds_consensus_vcf => :text do |min_callers|
     TSV.traverse step(:ds_combined_vcf), :type => :array, :into => :stream do |line|
       next line if line =~ /^#/
