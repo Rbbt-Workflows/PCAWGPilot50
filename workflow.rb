@@ -43,7 +43,7 @@ svABA
 ARGO_mutect2
 mutect2_pon_4_2_5
 muse
-strelka
+strelka_manta
 lofreq
 SAGE
 somatic_sniper
@@ -56,9 +56,9 @@ consensus_min3
   DS_CONSENSUS_CALLERS =<<-EOF.split("\n")
 mutect2_pon_4_2_5
 muse
-strelka
+strelka_manta
 lofreq
-sage
+SAGE
 somatic_sniper
 svABA
   EOF
@@ -177,9 +177,9 @@ svABA
       if hash["AF"]
         next if hash["AF"].to_f <= maf
       elsif hash["TIR"]
-        tar = hash["TAR"].split(",").first.to_f
+        dp = hash["DP"].split(",").first.to_f
         tir = hash["TIR"].split(",").first.to_f
-        af = tir.to_f / (tar + tir)
+        af = tir / dp.to_f
         next if af <= maf
       elsif hash["AU"]
         a,c,t,g = hash.values_at(*%w(AU CU TU GU)).collect{|v| v.to_i}

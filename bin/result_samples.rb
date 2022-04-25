@@ -26,13 +26,13 @@ if options[:help]
   exit 0
 end
 
-gs = Rbbt.results.find(:lib)
+result = Rbbt.result.find(:lib)
 
 files = TSV.setup({}, "Donor~caller#:type=:flat")
 
 callers = Set.new
 types = Set.new
-gs.glob("*").each do |vc_dir|
+result.glob("*").each do |vc_dir|
   vc = File.basename(vc_dir)
   callers << vc
   vc_dir.glob("*.vcf").each do |file|
