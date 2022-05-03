@@ -309,7 +309,7 @@ svABA
   dep :wgs_vcf
   dep :ds_vcf
   input :donor, :select, "Donor to compare to", nil, :select_options => SAMPLES, :jobname => true
-  dep_task :donor_vcfeval, HTS, :vcfeval, :input_vcf => :wgs_vcf, :truth_vcf => :ds_vcf, :reference => 'hg38'
+  dep_task :donor_vcfeval, HTS, :vcfeval, :input_vcf => :wgs_vcf, :truth_vcf => :ds_vcf, :reference => 'hg38', :truth_sample => nil, :input_sample => nil
 
   input :vcf_file, :file, "VCF file to evaluate", nil, :required => true
   input :donor, :select, "Donor to compare to", nil, :select_options => SAMPLES, :jobname => true
