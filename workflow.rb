@@ -21,6 +21,7 @@ lofreq
 muse_dbnsp
 muse_no_dbnsp
 mutect2
+mutect2_nobqsr
 somatic_sniper
 strelka_manta
 strelka_no_manta
