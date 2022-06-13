@@ -6,6 +6,7 @@
     - field = Misc.humanize(name).sub("Ds", "DS").sub("Wgs", "WGS")
     - input name, :select, "TSV field", nil, :select_options => tsv.column(field).values.flatten.compact.uniq + %w(all color)
   - input :donors, :array, "Use only donors in this list", nil
+  - input :callers, :array, "Use only WGS callers in this list", nil
     
 
 :ruby
@@ -37,10 +38,14 @@
   - field = Misc.humanize(name).sub("Ds", "DS").sub("Wgs", "WGS")
   - tsv = tsv.select(field => value)
 
+- if defined?(callers) 
+  - callers = callers.strip.split("\n").collect{|d| d.strip}
+  - tsv = tsv.select("WGS caller" => callers) if callers.any?
 
 - if defined?(donors) 
   - donors = donors.strip.split("\n").collect{|d| d.strip}
   - tsv = tsv.select("Donor" => donors) if donors.any?
+
 - if defined?(use_max_donors) && use_max_donors
   - counts = Misc.counts(tsv.column("Donor").values)
   - max = counts.values.max
@@ -63,20 +68,26 @@
     - v == "NaN" ? 0 : v
 
   - log :scatter_plot
+  - labels = tsv.column("Label").values.flatten.uniq
+  - consensus = labels.select{|l| l.include? 'consensus'}.sort
+  - ordered_labels = %w(ARGO_mutect2 mutect2) + (labels - consensus) + consensus
+  - ordered_labels = (ordered_labels & labels) + (labels - ordered_labels)
+    
+  - font_size = 18
   - if tsv.size > 0
-    %div.plot=R::SVG.ggplot(tsv, 'ggplot(data) + geom_point(aes(Sensitivity,Precision,color=Label)) + ylim(0,1) + xlim(0,1)', 7, 7) 
+    %div.plot=R::SVG.ggplot(tsv, "data$Label <- factor(data$Label, levels = #{R.ruby2R ordered_labels}); ggplot(data) + geom_point(aes(Sensitivity,Precision,color=Label)) + ylim(0,1) + xlim(0,1) + theme(text = element_text(size = #{font_size}, family = 'Times'))", 7, 7) 
 
   - log :barplot
   - if color_values.any?
-    %div.plot=R::SVG.ggplot(tsv, 'names(data) <- make.names(names(data)); ggplot(data) + geom_boxplot(aes(x=Label,y=F.score)) + rbbt.ggplot2.rotate_x_labels()', 7, 7) 
+    %div.plot=R::SVG.ggplot(tsv, "data$Label <- factor(data$Label, levels = #{R.ruby2R ordered_labels});names(data) <- make.names(names(data)); ggplot(data) + geom_boxplot(aes(x=Label,y=F.score)) + ylim(0,1) + rbbt.ggplot2.rotate_x_labels() + theme(text = element_text(size = #{font_size}, family = 'Times'))", 7, 7) 
 
   - log :barplot
   - if color_values.any?
-    %div.plot=R::SVG.ggplot(tsv, 'names(data) <- make.names(names(data)); ggplot(data) + geom_boxplot(aes(x=Label,y=Precision)) + rbbt.ggplot2.rotate_x_labels()', 7, 7) 
+    %div.plot=R::SVG.ggplot(tsv, "data$Label <- factor(data$Label, levels = #{R.ruby2R ordered_labels});names(data) <- make.names(names(data)); ggplot(data) + geom_boxplot(aes(x=Label,y=Precision)) + ylim(0,1) + rbbt.ggplot2.rotate_x_labels() + theme(text = element_text(size = #{font_size}, family = 'Times'))", 7, 7) 
 
   - log :barplot
   - if color_values.any?
-    %div.plot=R::SVG.ggplot(tsv, 'names(data) <- make.names(names(data)); ggplot(data) + geom_boxplot(aes(x=Label,y=Sensitivity)) + rbbt.ggplot2.rotate_x_labels()', 7, 7) 
+    %div.plot=R::SVG.ggplot(tsv, "data$Label <- factor(data$Label, levels = #{R.ruby2R ordered_labels});names(data) <- make.names(names(data)); ggplot(data) + geom_boxplot(aes(x=Label,y=Sensitivity)) + ylim(0,1) + rbbt.ggplot2.rotate_x_labels() + theme(text = element_text(size = #{font_size}, family = 'Times'))", 7, 7) 
 
   = table do
     - tsv
